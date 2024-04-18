@@ -19,6 +19,13 @@
   4. If the image is generated as desired, click export button to save it
   5. Make the target tremble in fear, then Gangtwoi him out
 
+# How to make execution file
+  1. Install pyinstaller
+  2. Use following command to make exe:
+```
+pyinstaller --onefile --windowed --noconsole --add-data "KakaoBold.ttf:." --add-data "mask2.jpg:." --add-data "1.jpg:." --add-data "1_mk2.jpg:." --add-data "4_2.png:." GangtwoiMaker.py
+```
+
 # Author
   Planning: SHOL
   Design: SHOL
