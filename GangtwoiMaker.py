@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import tkinter as tk
+import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 from tkinter.messagebox import showinfo
@@ -19,11 +20,19 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-def MakeGangtwoi(name: str, mode: int = 0):
-    global maskImg, bg, bg_mk2, btnImg
+def MakeGangtwoi(name: str, mode: int=0):
+    global maskImg, bg_mk1, bg_mk2, btnImg
     global resultImg
 
-    filename = askopenfilename(filetypes=[("jpg", ".jpg"), ("png", ".png")])
+    targetBG = None
+    if mode == 0:
+        targetBG = bg_mk1
+    elif mode == 1:
+        targetBG = bg_mk2
+    else:
+        return
+
+    filename = askopenfilename(filetypes=[("all", "*"), ("jpg", ".jpg"), ("png", ".png")])
     if filename == "":
         return 0
     stream = open(filename, 'rb')
@@ -35,9 +44,6 @@ def MakeGangtwoi(name: str, mode: int = 0):
     img = cv.cvtColor(img, cv.COLOR_BGR2BGRA)
     img_h, img_w = img.shape[:2]
 
-    targetBG = bg
-    if mode == 1:
-        targetBG = bg_mk2
     bg_h, bg_w = targetBG.shape[:2]
 
     # Resize image
@@ -76,7 +82,7 @@ def MakeGangtwoi(name: str, mode: int = 0):
     result = np.array(result_pil)
 
     resultImg = result.copy()
-    exportBtn["state"] = "normal"
+    gangtwoiBtn["state"] = "normal"
 
     result = cv.cvtColor(result, cv.COLOR_BGRA2RGBA)
     result = Image.fromarray(result)
@@ -121,11 +127,27 @@ def Save_Image():
         return
     cv.imwrite(savePath, resultImg)
 
+def AnimateSword(currentFrame=0):
+    global imgLabel, resultImg, frames, gifImgs
+    if resultImg is not None:
+        return
+    cut = gifImgs[currentFrame]
+    imgLabel.configure(image=cut)
+    imgLabel.image=cut
+    currentFrame += 1
+    if currentFrame == frames:
+        currentFrame = 0
+    imgLabel.after(50, lambda: AnimateSword(currentFrame))
+
+def ActiveGangTwoiBtn(event):
+    global generateGangtwoiBtn
+    generateGangtwoiBtn["state"] = "normal"
+
 def main():
-    global maskImg, bg, bg_mk2, btnImg
+    global maskImg, bg_mk1, bg_mk2, btnImg
     global win, topFrame, bottomFrame
     global fontPath, normalFont
-    global textbox, makeBtn1, makeBtn2, exportBtn, infoBtn, imgLabel
+    global textbox, gangtwoiTypeList, generateGangtwoiBtn, gangtwoiBtn, infoBtn, imgLabel
     global resultImg
 
     # Initialize variables
@@ -133,8 +155,8 @@ def main():
 
     # Load images
     maskImg = cv.imread(resource_path('./Resources/mask.jpg'), cv.IMREAD_GRAYSCALE)
-    bg = cv.imread(resource_path('./Resources/bg_mk1.jpg'), cv.IMREAD_UNCHANGED)
-    bg = cv.cvtColor(bg, cv.COLOR_BGR2BGRA)
+    bg_mk1 = cv.imread(resource_path('./Resources/bg_mk1.jpg'), cv.IMREAD_UNCHANGED)
+    bg_mk1 = cv.cvtColor(bg_mk1, cv.COLOR_BGR2BGRA)
     bg_mk2 = cv.imread(resource_path('./Resources/bg_mk2.jpg'), cv.IMREAD_UNCHANGED)
     bg_mk2 = cv.cvtColor(bg_mk2, cv.COLOR_BGR2BGRA)
     btnImg = cv.imread(resource_path('./Resources/btn.png'), cv.IMREAD_UNCHANGED)
@@ -142,9 +164,9 @@ def main():
     # Tkinter initialize
     win = tk.Tk(screenName='GangtwoiMaker', baseName=None, className='tk', useTk=1, sync=0, use=None)
     win.title('GangtwoiMaker')
-    win.geometry('400x50')
-    win.minsize(width=400, height=50)
-    win.maxsize(width=800, height=50)
+    win.geometry('500x250')
+    win.minsize(width=500, height=250)
+    win.maxsize(width=800, height=250)
     winSize_X = win.winfo_reqwidth()
     winSize_Y = win.winfo_reqheight()
 
@@ -160,15 +182,16 @@ def main():
     textbox = tk.Entry(topFrame)
     textbox.pack(side="left", fill="both", expand=True)
 
-    makeBtn1 = tk.Button(topFrame, text="강퇴 Mk1", highlightcolor='cyan', width=8, height=2, command=lambda: MakeGangtwoi(textbox.get(), 0), font=normalFont)
-    makeBtn1.pack(side="left", fill="y", expand=False)
+    gangtwoiTypeList = ttk.Combobox(topFrame, values=('강퇴 Mk1', '강퇴 Mk2'), width=8, height=2, font=normalFont, state="readonly")
+    gangtwoiTypeList.set("강퇴 유형")
+    gangtwoiTypeList.pack(side="left", fill="y", expand=False)
+    gangtwoiTypeList.bind("<<ComboboxSelected>>", ActiveGangTwoiBtn)
         
-    makeBtn2 = tk.Button(topFrame, text="강퇴 Mk2", highlightcolor='cyan', width=8, height=2, command=lambda: MakeGangtwoi(textbox.get(), 1), font=normalFont)
-    makeBtn2.pack(side="left", fill="y", expand=False)
+    generateGangtwoiBtn = tk.Button(topFrame, text="강퇴", highlightcolor='cyan', width=4, height=2, command=lambda: MakeGangtwoi(textbox.get(), gangtwoiTypeList.current()), font=normalFont, state="disabled")
+    generateGangtwoiBtn.pack(side="left", fill="y", expand=False)
 
-    exportBtn = tk.Button(topFrame, text="내보내기", highlightcolor='cyan', width=8, height=2, command=lambda: Save_Image(), font=normalFont)
-    exportBtn.pack(side="left", fill="y", expand=False)
-    exportBtn["state"] = "disabled"
+    gangtwoiBtn = tk.Button(topFrame, text="내보내기", highlightcolor='cyan', width=8, height=2, command=lambda: Save_Image(), font=normalFont, state="disabled")
+    gangtwoiBtn.pack(side="left", fill="y", expand=False)
 
     infoStr = """========================================
 
@@ -194,13 +217,28 @@ def main():
     imgLabel.pack(fill="both", anchor="n", expand=True)
     imgLabel.bind('<Configure>', resize_image)
 
+#region Animated idle window
+    gifFile = Image.open(resource_path('./Resources/gangtwoisword.gif'))
+
+    global frames
+    frames = gifFile.n_frames
+
+    global gifImgs
+    gifImgs = []
+    for i in range(frames):
+        cutImg = tk.PhotoImage(file=resource_path('./Resources/gangtwoisword.gif'), format=f"gif -index {i}")
+        gifImgs.append(cutImg)
+    
+    AnimateSword(0)
+#endregion
+
     win.mainloop()
 
 # Global variables
-global maskImg, bg, bg_mk2, btnImg
+global maskImg, bg_mk1, bg_mk2, btnImg
 global win, topFrame, bottomFrame
 global fontPath, normalFont
-global textbox, makeBtn1, makeBtn2, exportBtn, infoBtn, imgLabel
+global textbox, gangtwoiTypeList, generateGangtwoiBtn, gangtwoiBtn, infoBtn, imgLabel
 global resultImg
 
 if __name__ == "__main__":
