@@ -201,7 +201,7 @@ def main():
     gangtwoiTypeList.pack(side="left", fill="y", expand=False)
     gangtwoiTypeList.bind("<<ComboboxSelected>>", GangtwoiTypeListComboboxEvent)
         
-    generateGangtwoiBtn = tk.Button(topFrame, text="강퇴", highlightcolor='cyan', width=4, height=2, command=lambda: MakeGangtwoi(textboxTxt, gangtwoiTypeList.current()), font=normalFont, state="disabled")
+    generateGangtwoiBtn = tk.Button(topFrame, text="강퇴", highlightcolor='cyan', width=4, height=2, command=lambda: MakeGangtwoi(textboxTxt.get(), gangtwoiTypeList.current()), font=normalFont, state="disabled")
     generateGangtwoiBtn.pack(side="left", fill="y", expand=False)
 
     gangtwoiBtn = tk.Button(topFrame, text="내보내기", highlightcolor='cyan', width=8, height=2, command=lambda: Save_Image(), font=normalFont, state="disabled")
