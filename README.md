@@ -39,6 +39,8 @@ pyinstaller --onefile --windowed --noconsole --add-data "./Resources/font.ttf:./
   - [ ] Share image directly
   - [ ] Drag & drop
   - [ ] Save file name with Unicode
+  - [ ] Localization
+  - [ ] Add more types of Gangtwoi
 
 # Author
   Planning: SHOL
