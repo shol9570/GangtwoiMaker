@@ -37,6 +37,8 @@ pyinstaller --onefile --windowed --noconsole --add-data "./Resources/font.ttf:./
   - [ ] Shortcuts
   - [ ] Crop when image ratio is not 1:1
   - [ ] Share image directly
+  - [ ] Drag & drop
+  - [ ] Save file name with Unicode
 
 # Author
   Planning: SHOL
