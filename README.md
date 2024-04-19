@@ -15,7 +15,7 @@
   4. 원하는 대로 이미지가 뽑혔다면 내보내기를 눌러 저장하세요
   5. 대상을 두려움에 떨게 만든 뒤 기습 강퇴하세요
 
-
+<!-- -->
   1. Run GangtwoiMaker.exe
   2. Enter name in the blank text box
   3. Press the "Gangtwoi" button like "Gangtwoi Mk1" or "Gangtwoi Mk2" for the style you want
