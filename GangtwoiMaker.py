@@ -139,9 +139,20 @@ def AnimateSword(currentFrame=0):
         currentFrame = 0
     imgLabel.after(50, lambda: AnimateSword(currentFrame))
 
-def ActiveGangTwoiBtn(event):
-    global generateGangtwoiBtn
-    generateGangtwoiBtn["state"] = "normal"
+def EntyCallback(var, index, mode):
+    if var == "":
+        return
+    UpdateGangTwoiBtnState()
+
+def GangtwoiTypeListComboboxEvent(event):
+    UpdateGangTwoiBtnState()
+
+def UpdateGangTwoiBtnState():
+    global gangtwoiTypeList, generateGangtwoiBtn, textboxTxt
+    if textboxTxt.get() != "" and gangtwoiTypeList.current() >= 0:
+        generateGangtwoiBtn["state"] = "normal"
+    else:
+        generateGangtwoiBtn["state"] = "disabled"
 
 def main():
     global maskImg, bg_mk1, bg_mk2, btnImg
@@ -179,15 +190,18 @@ def main():
     bottomFrame = tk.Frame(win)
     bottomFrame.pack(side="bottom", fill="both", expand=True)
 
-    textbox = tk.Entry(topFrame)
+    global textboxTxt
+    textboxTxt = tk.StringVar()
+    textboxTxt.trace_add("write", EntyCallback)
+    textbox = tk.Entry(topFrame, textvariable=textboxTxt)
     textbox.pack(side="left", fill="both", expand=True)
 
     gangtwoiTypeList = ttk.Combobox(topFrame, values=('강퇴 Mk1', '강퇴 Mk2'), width=8, height=2, font=normalFont, state="readonly")
     gangtwoiTypeList.set("강퇴 유형")
     gangtwoiTypeList.pack(side="left", fill="y", expand=False)
-    gangtwoiTypeList.bind("<<ComboboxSelected>>", ActiveGangTwoiBtn)
+    gangtwoiTypeList.bind("<<ComboboxSelected>>", GangtwoiTypeListComboboxEvent)
         
-    generateGangtwoiBtn = tk.Button(topFrame, text="강퇴", highlightcolor='cyan', width=4, height=2, command=lambda: MakeGangtwoi(textbox.get(), gangtwoiTypeList.current()), font=normalFont, state="disabled")
+    generateGangtwoiBtn = tk.Button(topFrame, text="강퇴", highlightcolor='cyan', width=4, height=2, command=lambda: MakeGangtwoi(textboxTxt, gangtwoiTypeList.current()), font=normalFont, state="disabled")
     generateGangtwoiBtn.pack(side="left", fill="y", expand=False)
 
     gangtwoiBtn = tk.Button(topFrame, text="내보내기", highlightcolor='cyan', width=8, height=2, command=lambda: Save_Image(), font=normalFont, state="disabled")
@@ -197,6 +211,7 @@ def main():
 
     Program: GangtwoiMaker
     Author: SHOL
+    Version: v1.3
 
     The MIT License (MIT)
 
