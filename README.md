@@ -26,7 +26,7 @@
   1. Install pyinstaller
   2. Use following command to make exe:
 ```
-pyinstaller --onefile --windowed --noconsole --add-data "KakaoBold.ttf:." --add-data "mask2.jpg:." --add-data "1.jpg:." --add-data "1_mk2.jpg:." --add-data "4_2.png:." GangtwoiMaker.py
+pyinstaller --onefile --windowed --noconsole --add-data "./Resources/font.ttf:./Resources" --add-data "./Resources/mask.jpg:./Resources" --add-data "./Resources/bg_mk1.jpg:./Resources" --add-data "./Resources/bg_mk2.jpg:./Resources" --add-data "./Resources/btn.png:./Resources" GangtwoiMaker.py
 ```
 
 # Author

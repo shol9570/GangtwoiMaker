@@ -20,7 +20,8 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 def MakeGangtwoi(name: str, mode: int = 0):
-    global imgLabel, resultImg, exportBtn
+    global maskImg, bg, bg_mk2, btnImg
+    global resultImg
 
     filename = askopenfilename(filetypes=[("jpg", ".jpg"), ("png", ".png")])
     if filename == "":
@@ -64,7 +65,7 @@ def MakeGangtwoi(name: str, mode: int = 0):
     result[img_rebase[:,:,3] != 0] = img_rebase[img_rebase[:,:,3] != 0]
     
     # Add btn
-    result[btn[:,:,3] == 255] = cv.addWeighted(result, 0, btn, 1, 0)[btn[:,:,3] == 255]
+    result[btnImg[:,:,3] == 255] = cv.addWeighted(result, 0, btnImg, 1, 0)[btnImg[:,:,3] == 255]
     
     result_height, result_width = result.shape[:2]
 
@@ -88,7 +89,8 @@ def MakeGangtwoi(name: str, mode: int = 0):
     win.geometry("{width}x{height}".format(width=result_width,height=result_height+50))
 
 def resize_image(event):
-    global imgLabel, resultImg
+    global resultImg
+    
     if resultImg is None:
         return
     
@@ -100,20 +102,17 @@ def resize_image(event):
         height = event.height
         width = (int)(height * imgRatio)
 
-    resizedImg = cv.resize(resultImg, dsize=(width, height))
-    resizedImg = cv.cvtColor(resizedImg, cv.COLOR_BGRA2RGBA)
-    resizedImg = Image.fromarray(resizedImg)
-    tkImg = ImageTk.PhotoImage(image=resizedImg)
+    tempImg = cv.resize(resultImg, dsize=(width, height))
+    tempImg = cv.cvtColor(tempImg, cv.COLOR_BGRA2RGBA)
+    tempImg = Image.fromarray(tempImg)
+    tkImg = ImageTk.PhotoImage(image=tempImg)
 
     imgLabel.configure(image=tkImg)
     imgLabel.image = tkImg
 
-def get_name():
-    global linkedText
-    return linkedText
-
 def Save_Image():
     global resultImg
+
     if resultImg is None:
         return
     
@@ -122,77 +121,87 @@ def Save_Image():
         return
     cv.imwrite(savePath, resultImg)
 
-def Main():
-    return
+def main():
+    global maskImg, bg, bg_mk2, btnImg
+    global win, topFrame, bottomFrame
+    global fontPath, normalFont
+    global textbox, makeBtn1, makeBtn2, exportBtn, infoBtn, imgLabel
+    global resultImg
 
-# Initialize variables
-fontPath = resource_path('KakaoBold.ttf')
-resultImage = None
+    # Initialize variables
+    fontPath = resource_path('./Resources/font.ttf')
 
-# Load images
-maskImg = cv.imread(resource_path('mask2.jpg'), cv.IMREAD_GRAYSCALE)
-bg = cv.imread(resource_path('1.jpg'), cv.IMREAD_UNCHANGED)
-bg = cv.cvtColor(bg, cv.COLOR_BGR2BGRA)
-bg_mk2 = cv.imread(resource_path('1_mk2.jpg'), cv.IMREAD_UNCHANGED)
-bg_mk2 = cv.cvtColor(bg_mk2, cv.COLOR_BGR2BGRA)
-btn = cv.imread(resource_path('4_2.png'), cv.IMREAD_UNCHANGED)
+    # Load images
+    maskImg = cv.imread(resource_path('./Resources/mask.jpg'), cv.IMREAD_GRAYSCALE)
+    bg = cv.imread(resource_path('./Resources/bg_mk1.jpg'), cv.IMREAD_UNCHANGED)
+    bg = cv.cvtColor(bg, cv.COLOR_BGR2BGRA)
+    bg_mk2 = cv.imread(resource_path('./Resources/bg_mk2.jpg'), cv.IMREAD_UNCHANGED)
+    bg_mk2 = cv.cvtColor(bg_mk2, cv.COLOR_BGR2BGRA)
+    btnImg = cv.imread(resource_path('./Resources/btn.png'), cv.IMREAD_UNCHANGED)
 
-# Tkinter initialize
-win = tk.Tk(screenName='GangtwoiMaker', baseName=None, className='tk', useTk=1, sync=0, use=None)
-win.title('GangtwoiMaker')
-win.geometry('400x50')
-win.minsize(width=400, height=50)
-win.maxsize(width=800, height=50)
-winSize_X = win.winfo_reqwidth()
-winSize_Y = win.winfo_reqheight()
+    # Tkinter initialize
+    win = tk.Tk(screenName='GangtwoiMaker', baseName=None, className='tk', useTk=1, sync=0, use=None)
+    win.title('GangtwoiMaker')
+    win.geometry('400x50')
+    win.minsize(width=400, height=50)
+    win.maxsize(width=800, height=50)
+    winSize_X = win.winfo_reqwidth()
+    winSize_Y = win.winfo_reqheight()
 
-# Tkinter font
-pyglet.font.add_file(fontPath)
-normalFont=tkfont.Font(family='카카오 Regular', size=10, weight='normal')
+    # Tkinter font
+    pyglet.font.add_file(fontPath)
+    normalFont=tkfont.Font(family='카카오 Regular', size=10, weight='normal')
 
-topFrame = tk.Frame(win, height=2)
-topFrame.pack(side="top", fill="x", expand=False)
-bottomFrame = tk.Frame(win)
-bottomFrame.pack(side="bottom", fill="both", expand=True)
+    topFrame = tk.Frame(win, height=2)
+    topFrame.pack(side="top", fill="x", expand=False)
+    bottomFrame = tk.Frame(win)
+    bottomFrame.pack(side="bottom", fill="both", expand=True)
 
-textbox = tk.Entry(topFrame)
-textbox.pack(side="left", fill="both", expand=True)
+    textbox = tk.Entry(topFrame)
+    textbox.pack(side="left", fill="both", expand=True)
 
-makeBtn1 = tk.Button(topFrame, text="강퇴 Mk1", highlightcolor='cyan', width=8, height=2, command=lambda: MakeGangtwoi(textbox.get(), 0), font=normalFont)
-makeBtn1.pack(side="left", fill="y", expand=False)
+    makeBtn1 = tk.Button(topFrame, text="강퇴 Mk1", highlightcolor='cyan', width=8, height=2, command=lambda: MakeGangtwoi(textbox.get(), 0), font=normalFont)
+    makeBtn1.pack(side="left", fill="y", expand=False)
+        
+    makeBtn2 = tk.Button(topFrame, text="강퇴 Mk2", highlightcolor='cyan', width=8, height=2, command=lambda: MakeGangtwoi(textbox.get(), 1), font=normalFont)
+    makeBtn2.pack(side="left", fill="y", expand=False)
+
+    exportBtn = tk.Button(topFrame, text="내보내기", highlightcolor='cyan', width=8, height=2, command=lambda: Save_Image(), font=normalFont)
+    exportBtn.pack(side="left", fill="y", expand=False)
+    exportBtn["state"] = "disabled"
+
+    infoStr = """========================================
+
+    Program: GangtwoiMaker
+    Author: SHOL
+
+    The MIT License (MIT)
+
+    Copyright (c) 2024 SHOL
     
-makeBtn2 = tk.Button(topFrame, text="강퇴 Mk2", highlightcolor='cyan', width=8, height=2, command=lambda: MakeGangtwoi(textbox.get(), 1), font=normalFont)
-makeBtn2.pack(side="left", fill="y", expand=False)
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-exportBtn = tk.Button(topFrame, text="내보내기", highlightcolor='cyan', width=8, height=2, command=lambda: Save_Image(), font=normalFont)
-exportBtn.pack(side="left", fill="y", expand=False)
-exportBtn["state"] = "disabled"
+    ========================================"""
 
-infoStr = """========================================
+    infoBtn = tk.Button(topFrame, text="i", highlightcolor='cyan', width=2, height=2, command=lambda: showinfo("GangtwoiMaker info", infoStr), font=normalFont)
+    infoBtn.pack(side="left", fill="y", expand=False)
 
-  Program: GangtwoiMaker
-  Author: SHOL
+    resultImg = None
+    imgLabel = tk.Label(bottomFrame, image=None)
+    imgLabel.pack(fill="both", anchor="n", expand=True)
+    imgLabel.bind('<Configure>', resize_image)
 
-  The MIT License (MIT)
+    win.mainloop()
 
-  Copyright (c) 2024 SHOL
-  
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-  
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-========================================"""
-
-infoBtn = tk.Button(topFrame, text="i", highlightcolor='cyan', width=2, height=2, command=lambda: showinfo("GangtwoiMaker info", infoStr), font=normalFont)
-infoBtn.pack(side="left", fill="y", expand=False)
-
-resultImg = None
-imgLabel = tk.Label(bottomFrame, image=None)
-imgLabel.pack(fill="both", anchor="n", expand=True)
-imgLabel.bind('<Configure>', resize_image)
-
-win.mainloop()
+# Global variables
+global maskImg, bg, bg_mk2, btnImg
+global win, topFrame, bottomFrame
+global fontPath, normalFont
+global textbox, makeBtn1, makeBtn2, exportBtn, infoBtn, imgLabel
+global resultImg
 
 if __name__ == "__main__":
-    Main()
+    main()
