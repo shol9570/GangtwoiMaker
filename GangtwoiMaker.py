@@ -211,7 +211,7 @@ def main():
 
     Program: GangtwoiMaker
     Author: SHOL
-    Version: v1.3
+    Version: v1.3.1
 
     The MIT License (MIT)
 
