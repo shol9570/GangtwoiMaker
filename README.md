@@ -29,6 +29,15 @@
 pyinstaller --onefile --windowed --noconsole --add-data "./Resources/font.ttf:./Resources" --add-data "./Resources/mask.jpg:./Resources" --add-data "./Resources/bg_mk1.jpg:./Resources" --add-data "./Resources/bg_mk2.jpg:./Resources" --add-data "./Resources/btn.png:./Resources" GangtwoiMaker.py
 ```
 
+# Known issues
+  - Some of the fonts are broken
+
+# Roadmap
+  - [ ] Only one Gangtwoi button & Gangtwoi type list
+  - [ ] Shortcuts
+  - [ ] Crop when image ratio is not 1:1
+  - [ ] Share image directly
+
 # Author
   Planning: SHOL
 
